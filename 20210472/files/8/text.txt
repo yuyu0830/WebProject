@@ -1,0 +1,163 @@
+야구 시뮬레이터
+<br>>>> - 이름 : 야구 시뮬레이터
+<br> - 작성 : Python
+<br> - 제작 기간 : 진행중
+<br> - 제작 시기 : 진행중
+<br> - 설명 : 파이썬으로 야구를 시뮬레이트 할 수 있게 만든 코드이다. 투수와 타자를 각각 4가지씩의 스탯으로 나누어 해당 스탯을 기준으로 안타, 장타, 아웃, 볼넷 등의 여부를 나누며 양팀 3아웃씩 총 9회, 54아웃을 하면 게임이 종료된다.
+<br>>>>import random as rd
+<br>
+<br>class team:
+<br>&emsp;def __init__(self, n):
+<br>&emsp;&emsp;self.name = n
+<br>&emsp;&emsp;self.score = 0
+<br>&emsp;&emsp;self.p_list = []
+<br>&emsp;&emsp;self.h_list = []
+<br>&emsp;
+<br>&emsp;class pitcher:
+<br>&emsp;&emsp;def __init__(self, li):
+<br>&emsp;&emsp;&emsp;self.name = li[0]
+<br>&emsp;&emsp;&emsp;self.spe = li[1]
+<br>&emsp;&emsp;&emsp;self.mov = li[2]
+<br>&emsp;&emsp;&emsp;self.com = li[3]
+<br>
+<br>&emsp;class hitter:
+<br>&emsp;&emsp;def __init__(self, li):
+<br>&emsp;&emsp;&emsp;self.name = li[0]
+<br>&emsp;&emsp;&emsp;self.pow = li[1]
+<br>&emsp;&emsp;&emsp;self.bte = li[2]
+<br>&emsp;&emsp;&emsp;self.acc = li[3]
+<br>
+<br>&emsp;def pitchers(self, li):
+<br>&emsp;&emsp;for i in range(len(li)):
+<br>&emsp;&emsp;&emsp;temp = self.pitcher(li[i])
+<br>&emsp;&emsp;&emsp;self.p_list.append(temp)
+<br>&emsp;
+<br>&emsp;def hitters(self, li):
+<br>&emsp;&emsp;for i in range(len(li)):
+<br>&emsp;&emsp;&emsp;temp = self.hitter(li[i])
+<br>&emsp;&emsp;&emsp;self.h_list.append(temp)
+<br>
+<br>def game(t1, t2):
+<br>&emsp;game = True
+<br>&emsp;hit_num1 = 1
+<br>&emsp;hit_num2 = 1
+<br>&emsp;pit_num1 = 1
+<br>&emsp;pit_num2 = 1
+<br>&emsp;innings = 1
+<br>&emsp;fl = 0 #0 = 초, 1 = 말
+<br>&emsp;while game == True:
+<br>&emsp;&emsp;if fl == 0:
+<br>&emsp;&emsp;&emsp;print("{}회 초 {}의 공격".format(innings, t1.name))
+<br>&emsp;&emsp;&emsp;inning(t1, t2, pit_num2, hit_num1)
+<br>&emsp;&emsp;&emsp;fl = 1
+<br>&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;print("{}회 말 {}의 공격".format(innings, t2.name))
+<br>&emsp;&emsp;&emsp;inning(t2, t1, pit_num1, hit_num2)
+<br>&emsp;&emsp;&emsp;fl = 0
+<br>&emsp;&emsp;&emsp;if innings >= 9 and t1.score != t2.score:
+<br>&emsp;&emsp;&emsp;&emsp;game = False
+<br>&emsp;&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;&emsp;innings += 1
+<br>&emsp;print("경기 종료\n{} {} : {} {}".format(t1.name, t1.score, t2.score, t2.name))
+<br>
+<br>def inning(of, df, p_num, h_num):
+<br>&emsp;out_ct = 0
+<br>&emsp;base = [0, 0, 0]
+<br>&emsp;out_list = ['타자 플라이 아웃', '타자 인플레이 아웃', '타자 삼진 아웃']
+<br>&emsp;while out_ct != 3:
+<br>&emsp;&emsp;print("\n&emsp;{}번타자 {}\n&emsp;{} out, {}, {}, {}, {} : {}".format(h_num, of.h_list[h_num - 1].name, out_ct, base[0], base[1], base[2], of.score, df.score))
+<br>&emsp;&emsp;result = vs(df.p_list[p_num - 1], of.h_list[h_num - 1])
+<br>&emsp;&emsp;if result in [5, 6, 7]:
+<br>&emsp;&emsp;&emsp;print("&emsp;{} {}".format(of.h_list[h_num - 1].name, out_list[result - 5]))
+<br>&emsp;&emsp;&emsp;out_ct += 1
+<br>&emsp;&emsp;elif result == 1:
+<br>&emsp;&emsp;&emsp;print("&emsp;{} 타자의 홈런!".format(of.h_list[h_num - 1].name))
+<br>&emsp;&emsp;&emsp;of.score += (base.count(1) + 1)
+<br>&emsp;&emsp;&emsp;base[0] = 0
+<br>&emsp;&emsp;&emsp;base[1] = 0
+<br>&emsp;&emsp;&emsp;base[2] = 0
+<br>&emsp;&emsp;elif result == 2:
+<br>&emsp;&emsp;&emsp;print("&emsp;{} 타자의 2루타!".format(of.h_list[h_num - 1].name))
+<br>&emsp;&emsp;&emsp;if base[2] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;base[2] = 0
+<br>&emsp;&emsp;&emsp;&emsp;of.score += 1
+<br>&emsp;&emsp;&emsp;if base[1] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;of.score += 1
+<br>&emsp;&emsp;&emsp;if base[0] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;base[0] = 0
+<br>&emsp;&emsp;&emsp;&emsp;base[2] = 1
+<br>&emsp;&emsp;&emsp;base[1] = 1
+<br>&emsp;&emsp;elif result == 3:
+<br>&emsp;&emsp;&emsp;print("&emsp;{} 타자의 안타!".format(of.h_list[h_num - 1].name))
+<br>&emsp;&emsp;&emsp;if base[2] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;base[2] = 0
+<br>&emsp;&emsp;&emsp;&emsp;of.score += 1
+<br>&emsp;&emsp;&emsp;if base[1] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;base[1] = 0
+<br>&emsp;&emsp;&emsp;&emsp;base[2] = 1
+<br>&emsp;&emsp;&emsp;if base[0] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;base[1] = 1
+<br>&emsp;&emsp;&emsp;base[0] = 1
+<br>&emsp;&emsp;elif result == 4:
+<br>&emsp;&emsp;&emsp;print("&emsp;{} 타자의 볼넷".format(of.h_list[h_num - 1].name))
+<br>&emsp;&emsp;&emsp;if base[2] == 1 and base[1] == 1 and base[0] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;of.score += 1
+<br>&emsp;&emsp;&emsp;elif base[2] == 0 and base[1] == 1 and base[0] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;base[2] = 1
+<br>&emsp;&emsp;&emsp;elif base[1] == 0 and base[0] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;base[1] = 1
+<br>&emsp;&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;&emsp;base[0] = 1
+<br>&emsp;&emsp;if h_num == 9:
+<br>&emsp;&emsp;&emsp;h_num = 1
+<br>&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;h_num += 1
+<br>
+<br>def vs(p, h):
+<br>&emsp;v_p = p.spe / h.pow
+<br>&emsp;m_h = p.mov / h.bte
+<br>&emsp;c_a = p.com / h.acc
+<br>
+<br>&emsp;hit = int((v_p * 0.7 + m_h * 0.7 + c_a * 1.6) * 100)
+<br>&emsp;bb = int((m_h*2 + c_a) / 3 * 100)
+<br>&emsp;l_hit = int(hit * (v_p + c_a) / 6)
+<br>&emsp;hr = int(hit * (v_p / 6))
+<br>&emsp;onbase = hit + bb
+<br>&emsp;out = 1000 - onbase
+<br>&emsp;all = v_p + m_h + c_a
+<br>&emsp;f_out = int(out * (v_p / all))
+<br>&emsp;in_out = int(out * (m_h / all))
+<br>&emsp;k_out = out - f_out - in_out
+<br>&emsp;num = rd.randint(0, 999)
+<br>
+<br>&emsp;if num < hr:
+<br>&emsp;&emsp;return 1
+<br>&emsp;elif num < l_hit:
+<br>&emsp;&emsp;return 2
+<br>&emsp;elif num < hit:
+<br>&emsp;&emsp;return 3
+<br>&emsp;elif num < hit + bb:
+<br>&emsp;&emsp;return 4
+<br>&emsp;elif num < hit + bb + f_out:
+<br>&emsp;&emsp;return 5
+<br>&emsp;elif num < hit + bb + f_out + in_out:
+<br>&emsp;&emsp;return 6
+<br>&emsp;elif num < bb + f_out + in_out + k_out:
+<br>&emsp;&emsp;return 7
+<br>
+<br>kt = team("kt wiz")
+<br>kt_p_list = [['고영표', 70, 90, 80], ['소형준', 70, 80, 60], ['엄상백', 70, 85, 80]]
+<br>kt_h_list = [['조용호', 65, 85, 85], ['황재균', 75, 80, 75], ['강백호', 85, 80, 75], ['호잉', 90, 60, 55], ['배정대', 65, 75, 85], ['장성우', 85, 55, 60], ['유한준', 50, 75, 70], ['박경수', 75, 70, 70], ['심우준', 70, 75, 80]]
+<br>nc = team("nc 다이노스")
+<br>nc_p_list = [['송명기', 79, 85, 77], ['이재학', 73, 89, 72], ['신민혁', 75, 79, 72]]
+<br>nc_h_list = [['최정원', 66, 75, 91], ['전민수', 79, 73, 71], ['나성범', 92, 68, 78], ['양의지', 89, 93, 87], ['알테어', 90, 71, 76], ['노진혁', 84, 83, 83], ['강진성', 79, 73, 74], ['박준영', 74, 74, 69], ['정현', 71, 76, 73]]
+<br>kt.pitchers(kt_p_list)
+<br>kt.hitters(kt_h_list)
+<br>nc.pitchers(nc_p_list)
+<br>nc.hitters(nc_h_list)
+<br>game(kt, nc)
+<br>
+<br>>>>완성은 되었지만 밸런스의 문제로 잠시 덮어두고 있는 비운의 프로그램이다. 진행하면 41:27 같은 터무니 없는 점수가 나온다. 현재 KBO 기록실을 통해 타자들의 평균 타율과 분포, 장타율과 같은 스탯을을 분석중에 있으며 완료되는대로 코드에 접목시켜 밸런싱을 할 예정이다.
+<br>꼭 완성시키고싶은 애증의 프로그램이다.
+<br>>>>
+<iframe width="980" height="532" src="https://www.youtube.com/embed/ylC6szVTRdw?list=PLeWHcBUi6c1fnOcG7w04ukyeKeDv6ezUG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

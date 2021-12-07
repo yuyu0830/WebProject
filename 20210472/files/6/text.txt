@@ -1,0 +1,162 @@
+N_B Method
+<br>>>>
+ - 이름 : 뉴턴 메소드, 바이섹션 메소드
+<br> - 작성 : Python numpy, matplotlib 모듈
+<br> - 제작 기간 : 1주일
+<br> - 제작 시기 : 21년 6월
+<br> - 설명 : 친구가 기말고사를 코딩으로 한다고 하는데 도와달라고 해서 도와줬다. 어떤 방정식 f(x)의 값이 0이 될 때 x의 값을 찾는 공식으로 이분법(바이섹션 메소드)와 뉴턴 메소드가 있다. 이 것을 코드로 만들어 비교하는 것이다. 수많은 시행착오 끝에 두 방법을 비교하는 식을 완성하였다.
+<br>>>>
+import numpy as np
+<br>import matplotlib.pyplot as plt
+<br>import timeit
+<br>
+<br>
+<br>def f(x) :
+<br>&emsp;return -2 * np.sin(x) ** 5 + np.exp(-2 * x) + 0.8 * x ** 3 + 7 * x - 1 #함수 입력
+<br>
+<br>
+<br>def f1(x) :
+<br>&emsp;return  -10 * np.cos(x) * np.sin(x) ** 4 - 2 * np.exp(-2 * x) + 2.4 * x ** 2 + 7 #함수 미분값 입력
+<br>
+<br>
+<br>re = 1
+<br>
+<br>
+<br>
+<br>################################
+<br>#초기값 참조용 그래프#
+<br>
+<br>
+<br>
+<br>print("초기값 참조를 위한 그래프를 표시합니다.")
+<br>while re == 1 :
+<br>&emsp;a = float(input("초기값 a를 입력해주세요 : "))
+<br>&emsp;b = float(input("초기값 b를 입력해주세요 : "))
+<br>&emsp;c = float(input("값의 스텝을 입력해주세요 : "))
+<br>
+<br>&emsp;if a == 0 and b == 0 and c == 0 :
+<br>&emsp;&emsp;re = 0
+<br>&emsp;else :
+<br>&emsp;&emsp;g = np.arange(a, b, c)
+<br>&emsp;&emsp;y = -2 * np.sin(g) ** 5 + np.exp(-2 * g) + 0.8 * g ** 3 + 7 * g - 1 #함수 입력
+<br>
+<br>&emsp;&emsp;plt.plot(g, y)
+<br>&emsp;&emsp;plt.axvline(0, color='black')
+<br>&emsp;&emsp;plt.axhline(0, color='black')
+<br>&emsp;&emsp;plt.xlabel('X axis')
+<br>&emsp;&emsp;plt.ylabel('Y axis')
+<br>&emsp;&emsp;plt.show()
+<br>&emsp;&emsp;re = int(input("\n그래프를 다시 보시려면 1번\n아니면 아무 숫자를 입력해주세요 : "))
+<br>&emsp;
+<br>
+<br>################################
+<br>#뉴턴-랩슨 메소드#
+<br>
+<br>
+<br>print("현재 함수 : -2sin(x)^5 + exp(-2x) + 0.8x^3 + 7x - 1") #함수 입력
+<br>print("뉴턴-랩슨 메소드 해결 결과")
+<br>z = float(input("┌ 초기값 설정 : "))
+<br>
+<br>
+<br>&emsp;&emsp;  
+<br>i = 1 #사이클 횟수
+<br>N = 100 #사이클 최대 제한
+<br>
+<br>tol = 1.0e-6 #오차값
+<br>
+<br>T = False #성공 여부 논리값
+<br>
+<br>
+<br>st = timeit.default_timer() #타이머 시작
+<br>
+<br>while (i <= N) and (T == False) :
+<br>&emsp;&emsp;
+<br>&emsp;x = z - f(z) / f1(z)
+<br>&emsp;&emsp;
+<br>&emsp;if abs(x - z) < tol : #성공 여부 확인
+<br>&emsp;&emsp;print("├ {}번째, 값은 {}\n├ 성공!".format(i, round(x, 6)))
+<br>&emsp;&emsp;T = True
+<br>&emsp;&emsp;N_N = i
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;else : 
+<br>&emsp;&emsp;z = x
+<br>&emsp;&emsp;print("├ {}번째, 현재값 : {} f(x)의 값 {}".format(i, round(x, 6), round(f(x),  6)))
+<br>&emsp;&emsp;i += 1
+<br>
+<br>if T == False : #사이클 다 돌 동안 값이 안나올 때
+<br>&emsp;print("├ 실패")
+<br>&emsp;&emsp;
+<br>et = timeit.default_timer() #타이머 끝
+<br>timeN = et - st
+<br>&emsp;
+<br>print("└ {}초 걸렸습니다".format(round(timeN, 6)))
+<br>
+<br>
+<br>################################
+<br>#바이섹션 메소드#
+<br>
+<br>
+<br>print("\n바이섹션 메소드 해결 결과")
+<br>err = False
+<br>while err == False :
+<br>&emsp;a = float(input("┌ a값 설정 : "))
+<br>&emsp;b = float(input("├ b값 설정 : "))
+<br>
+<br>&emsp;bb = b #오류 검사용
+<br>
+<br>&emsp;st = timeit.default_timer() #타이머
+<br>
+<br>&emsp;i = 1 #사이클 횟수
+<br>&emsp;N = 100 #사이클 최대 제한
+<br>&emsp;&emsp;
+<br>&emsp;tol = 1.0e-6 #오차값
+<br>
+<br>&emsp;T = False #성공 여부 논리값
+<br>
+<br>&emsp;while (i <= N) and (T == False) :
+<br>&emsp;&emsp;mid = (a + b) / 2   #a, b의 중간값
+<br>
+<br>&emsp;&emsp;if (abs(f(mid)) < tol) or ((b-a) / 2) < tol : #정답 확인용 함수
+<br>&emsp;&emsp;&emsp;print("├ {}번째 값은 {}".format(i, round(mid, 6)))
+<br>&emsp;&emsp;&emsp;T = True
+<br>&emsp;&emsp;&emsp;B_N = i
+<br>
+<br>&emsp;&emsp;else :
+<br>&emsp;&emsp;&emsp;print("├ {}번째 값은 {}".format(i, round(mid, 6))) #정답 아닐시
+<br>&emsp;&emsp;&emsp;i += 1
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;if f(a) * f(mid) > 0 : #중간값 설정
+<br>&emsp;&emsp;&emsp;a = mid
+<br>
+<br>&emsp;&emsp;else :
+<br>&emsp;&emsp;&emsp;b = mid;
+<br>
+<br>&emsp;if T == True and (abs(bb - mid) < 1.0e-5) :
+<br>&emsp;&emsp;print("├ 오류가 발생하였습니다.\n├ a, b 값 안에 근이 2개 이상 있거나")
+<br>&emsp;&emsp;print("├ a, b 값 안에 근이 없습니다.\n└ a, b 값을 다시 설정해주세요")
+<br>
+<br>&emsp;elif T == True :
+<br>&emsp;&emsp;print("├ 성공!")
+<br>&emsp;&emsp;err = True
+<br>&emsp;&emsp;
+<br>&emsp;elif T == False :
+<br>&emsp;&emsp;print("├ 실패")
+<br>&emsp;&emsp;err = True
+<br>
+<br>et = timeit.default_timer()
+<br>timeB = et - st
+<br>print("└ {}초 걸렸습니다".format(round(timeB, 6)))
+<br>
+<br>
+<br>################################
+<br>#비교#
+<br>
+<br>print("\n\n양 메소드 비교\n뉴턴-랩슨 메소드\n걸린 시간 : {}\n걸린 횟수 : {}".format(round(timeN, 6), N_N))
+<br>print("바이섹션 메소드\n걸린 시간 : {}\n걸린 횟수 : {}".format(round(timeB, 6), B_N))
+<br>>>>
+코드의 이해에는 수학적인 지식이 필요하다. 코드를 짠 나도 수많은 예제를 뒤로하고 이분법과 뉴턴 메소드를 먼저 공부하고 이해한 뒤 코드화 시켰다.
+<br>장단점을 비교하는 코드인 만큼 파악할 수 있도록 결과 도출까지의 횟수와 시간을 비교할 수 있게 제작하였다.
+<br>처음보는 형태의 코드인 만큼 참 많이 실패하고 고장나고 오류가 났지만 아주 많은 도전을 통해 문제를 파악하고 해결하여 결국 만족할만한 작품이 나왔다.
+<br>프로그램으로 수학을 할 수 있다는 것을 배웠으며 디버깅을 해나가는 과정을 배웠다.
+<br>>>>
+<iframe width="980" height="532" src="https://www.youtube.com/embed/YLSMxrVtW1A?list=PLeWHcBUi6c1fnOcG7w04ukyeKeDv6ezUG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

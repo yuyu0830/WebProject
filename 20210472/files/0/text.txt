@@ -1,0 +1,89 @@
+숫자야구
+>>>> - 이름 : 숫자야구
+<br> - 작성 : Python
+<br> - 제작 기간 : 1일
+<br> - 제작 시기 : 21년 2월
+<br> - 설명 : 숫자야구를 파이썬으로 구현. 겹치는 숫자가 없는 임의의 4자리 숫자를 스무고개 하듯이 맞춰가는 게임. 플레이어는 한 턴마다 임의의 4자리 숫자를 말할 수 있고, 질문자는 임의의 4숫자와 자신이 정한 4숫자를 비교하여 C와 B 카운트를 통해 알려준다.이 C와 B 카운트를 통해 질문자가 정한 4자리 숫자를 맞추면 플레이어의 승리, 맞추지 못하면 질문자의 승리이다.
+<br>>>>import random
+<br>
+<br>def fin_err(ins) :
+<br>&emsp;inc = str(ins)
+<br>&emsp;if len(inc) != 4 :
+<br>&emsp;&emsp;return 0
+<br>&emsp;else :
+<br>&emsp;&emsp;for i in range(0,9) :
+<br>&emsp;&emsp;&emsp;ck = inc.count(str(i))
+<br>&emsp;&emsp;&emsp;if ck >= 2 :
+<br>&emsp;&emsp;&emsp;&emsp;return 0
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;return 1
+<br>
+<br>def rand() :
+<br>&emsp;num = []
+<br>&emsp;ran = str(random.randint(1,9))
+<br>&emsp;num.append(ran)
+<br>&emsp;i = 0
+<br>&emsp;
+<br>&emsp;while i != 3 :
+<br>&emsp;&emsp;ran = str(random.randint(0,9))
+<br>&emsp;&emsp;if ran not in num :
+<br>&emsp;&emsp;&emsp;num.append(ran)
+<br>&emsp;&emsp;&emsp;i += 1
+<br>&emsp;return num
+<br>
+<br>def sb(num, inc) :
+<br>&emsp;i = 0
+<br>&emsp;b = 0
+<br>&emsp;for i in range(0,4):
+<br>&emsp;&emsp;if inc[i] == num[i]:
+<br>&emsp;&emsp;&emsp;b += 1
+<br>&emsp;return b
+<br>
+<br>def sc(num, inc) :
+<br>&emsp;i = 0
+<br>&emsp;c = 0
+<br>&emsp;for i in range(0,4):
+<br>&emsp;&emsp;if inc[i] in num:
+<br>&emsp;&emsp;&emsp;c += 1
+<br>&emsp;return c
+<br>
+<br>def main() :
+<br>&emsp;num = rand()
+<br>&emsp;turn = 1
+<br>&emsp;b = 0
+<br>&emsp;
+<br>&emsp;while turn <= 10 and b != 4 :
+<br>&emsp;&emsp;ins = int(input("\n{}번째 턴입니다.\n예상 값을 입력해주세요 : ".format(turn)))
+<br>&emsp;&emsp;while fin_err(ins) == False :
+<br>&emsp;&emsp;&emsp;ins = int(input("잘못된 입력입니다.\n값을 다시 입력해주세요 : "))
+<br>
+<br>&emsp;&emsp;inc = str(ins)
+<br>&emsp;&emsp;
+<br>&emsp;&emsp;b = sb(num, inc)
+<br>&emsp;&emsp;c = sc(num, inc)
+<br>
+<br>&emsp;&emsp;if c == 0 and b > 0 :
+<br>&emsp;&emsp;&emsp;continue
+<br>&emsp;&emsp;else :
+<br>&emsp;&emsp;&emsp;c = c - b
+<br>&emsp;&emsp;
+<br>
+<br>&emsp;&emsp;if b == 4 :
+<br>&emsp;&emsp;&emsp;print("축하합니다! 정답입니다!\n입력횟수 {}번".format(turn))
+<br>
+<br>&emsp;&emsp;elif b!= 4 and turn > 9 :
+<br>&emsp;&emsp;&emsp;print("실패입니다. Game Over\n정답 : "+num)
+<br>
+<br>&emsp;&emsp;else :
+<br>&emsp;&emsp;&emsp;print("{}B{}C".format(b, c))
+<br>&emsp;&emsp;&emsp;turn += 1
+<br>
+<br>main()
+<br>re = int(input("다시하시려면 1, 아니면 0 을 눌러주세요 : "))
+<br>if re == 1 :
+<br>&emsp;re = 0
+<br>&emsp;main()
+<br>>>> 처음으로 직쩝 짜본 코드인 만큼 의미가 크다. 처음은 직접 짜보고 다른 사람들이 짜둔 코드를 보고 다시 한번 짜보았다. 
+<br>짜는 과정도 재미있었고 프로그램이 돌아가는 전체적인 모양새를 가늠할 수 있던 좋은 기회가 되었다.
+<br>>>>
+<iframe width="980" height="532" src="https://www.youtube.com/embed/VI8pfpCkXQw?list=PLeWHcBUi6c1fnOcG7w04ukyeKeDv6ezUG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

@@ -1,0 +1,286 @@
+지뢰찾기
+<br>>>>
+ - 이름 : 지뢰찾기
+<br> - 작성 : Python pygame 모듈
+<br> - 제작 기간 : 2주일
+<br> - 제작 시기 : 8월
+<br> - 설명 : pygame 모듈을 이용하여 지뢰찾기를 구현하였다.
+<br>>>>
+import pygame as pg
+<br>import sys
+<br>import random
+<br>from time import *
+<br>from setting import *
+<br>
+<br># 시작할 때 누른 곳이 0 덩어리
+<br># 클리어, 게임 오버 시 텀 둬서 바로 실행 안되게 하기
+<br># 클리어, 게임 오버 이펙트 변경(지뢰 보이게 하기 등)
+<br># 게임 새로 시작 만들기
+<br># 깃발 그림 수정
+<br># 깃발 다시 없애기 기능
+<br># 숫자 누르기, 마우스 가운데 버튼 기능 구현
+<br># 숫자별 색, 숫자 위치 지정
+<br># 시간을 점수로
+<br># 시작 화면 꾸미기
+<br># 옵션등 생성
+<br>
+<br>class game:
+<br>&emsp;def __init__(self):
+<br>&emsp;&emsp;pg.init()
+<br>&emsp;&emsp;self.screen = pg.display.set_mode(SIZE)
+<br>&emsp;&emsp;self.title = pg.display.set_caption(TITLE)
+<br>&emsp;&emsp;self.clock = pg.time.Clock()
+<br>&emsp;&emsp;self.font = pg.font.SysFont("arial", 48, True, False)
+<br>&emsp;&emsp;self.m_font = pg.font.SysFont("arial", 30, True, False)
+<br>&emsp;&emsp;self.new()
+<br>
+<br>&emsp;def new(self):
+<br>&emsp;&emsp;self.running = True
+<br>&emsp;&emsp;self.state = 1 #select, ingame, option, gameover, clear
+<br>&emsp;&emsp;self.level = [0, 0, 0, 0] #level, row, col, mine, block size
+<br>&emsp;&emsp;self.screen.fill(WHITE)
+<br>&emsp;&emsp;self.clicked = pg.image.load("clicked.png")
+<br>&emsp;&emsp;self.unclicked = pg.image.load("unclicked.png")
+<br>&emsp;&emsp;self.mine = pg.image.load("mine.png")
+<br>&emsp;&emsp;self.flag = pg.image.load("flag.png")
+<br>&emsp;&emsp;self.count = [0, 0, 0] #count, score, real score
+<br>&emsp;&emsp;self.pos = [0, 0]
+<br>&emsp;&emsp;self.check = []
+<br>&emsp;&emsp;self.check_2 = []
+<br>&emsp;&emsp;self.open = []
+<br>&emsp;&emsp;self.first_click = [0, 0]
+<br>&emsp;&emsp;
+<br>&emsp;def select(self):
+<br>&emsp;&emsp;self.mouse_state = self.mouse_location()
+<br>&emsp;&emsp;self.text_level = self.font.render("Level", True, BLACK)
+<br>&emsp;&emsp;self.text_easy = self.font.render("easy", True, BLACK)
+<br>&emsp;&emsp;self.text_normal = self.font.render("normal", True, BLACK)
+<br>&emsp;&emsp;self.text_hard = self.font.render("hard", True, BLACK)
+<br>&emsp;&emsp;if self.mouse_pre[0] == 0:
+<br>&emsp;&emsp;&emsp;if self.mouse_state == 1:
+<br>&emsp;&emsp;&emsp;&emsp;self.text_easy = self.font.render("easy", True, RED)
+<br>&emsp;&emsp;&emsp;elif self.mouse_state == 2:
+<br>&emsp;&emsp;&emsp;&emsp;self.text_normal = self.font.render("normal", True, RED)
+<br>&emsp;&emsp;&emsp;elif self.mouse_state == 3:
+<br>&emsp;&emsp;&emsp;&emsp;self.text_hard = self.font.render("hard", True, RED)
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_easy, [300, 120])
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_normal, [300, 250])
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_hard, [300, 380])
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_level, [80, 250])
+<br>&emsp;&emsp;&emsp;pg.display.update()
+<br>&emsp;&emsp;
+<br>&emsp;&emsp;elif self.mouse_pre[0] == 1: #set level
+<br>&emsp;&emsp;&emsp;if self.mouse_state == 1:
+<br>&emsp;&emsp;&emsp;&emsp;self.level = [1, 12, 10, 2, 50]
+<br>&emsp;&emsp;&emsp;elif self.mouse_state == 2:
+<br>&emsp;&emsp;&emsp;&emsp;self.level = [2, 22, 18, 50, 25]
+<br>&emsp;&emsp;&emsp;elif self.mouse_state == 3:
+<br>&emsp;&emsp;&emsp;&emsp;self.level = [3, 27, 22, 99, 20]
+<br>&emsp;&emsp;
+<br>&emsp;&emsp;if self.level[0] != 0:
+<br>&emsp;&emsp;&emsp;sleep(0.2)
+<br>&emsp;&emsp;&emsp;self.start()
+<br>&emsp;&emsp;&emsp;&emsp;
+<br>&emsp;def start(self):
+<br>&emsp;&emsp;self.s_font = pg.font.SysFont("arial", int(self.level[4] / 1.5), True, False)
+<br>&emsp;&emsp;self.clicked = pg.transform.scale(self.clicked, [self.level[4], self.level[4]])
+<br>&emsp;&emsp;self.unclicked = pg.transform.scale(self.unclicked, [self.level[4], self.level[4]])
+<br>&emsp;&emsp;self.mine = pg.transform.scale(self.mine, [self.level[4], self.level[4]])
+<br>&emsp;&emsp;self.flag = pg.transform.scale(self.flag, [self.level[4], self.level[4]])
+<br>&emsp;&emsp;self.board = [[0 for i in range(self.level[2] + 4)] for j in range(self.level[1] + 4)]
+<br>&emsp;&emsp;self.board_state = [[0 for i in range(self.level[2] + 4)] for j in range(self.level[1] + 4)]
+<br>&emsp;&emsp;for i in range(self.level[3]): #spown mine
+<br>&emsp;&emsp;&emsp;x = random.randint(1, self.level[1] - 2)
+<br>&emsp;&emsp;&emsp;y = random.randint(1, self.level[2] - 2)
+<br>&emsp;&emsp;&emsp;while True:
+<br>&emsp;&emsp;&emsp;&emsp;if self.board[x][y] < 0 or [self.pos[0], self.pos[1]] == [x, y]:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;x = random.randint(1, self.level[1] - 2)
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;y = random.randint(1, self.level[2] - 2)
+<br>&emsp;&emsp;&emsp;&emsp;elif self.board[x][y] == 0 and [self.pos[0], self.pos[1]] != [x, y]:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;break
+<br>&emsp;&emsp;&emsp;self.board[x][y] = -1
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;for i in range(1, self.level[1]): #count around mine
+<br>&emsp;&emsp;&emsp;for j in range(1, self.level[2]):
+<br>&emsp;&emsp;&emsp;&emsp;if self.board[i][j] >= 0:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;for x in range(-1, 2):
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;for y in range(-1, 2):
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;if self.board[i+x][j+y] < 0:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;self.count[0] += 1
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.board[i][j] = self.count[0]
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.count[0] = 0
+<br>&emsp;&emsp;self.state = 2
+<br>
+<br>&emsp;def run(self):
+<br>&emsp;&emsp;if self.state == 1: #select
+<br>&emsp;&emsp;&emsp;self.select()
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;elif self.state == 2: #ingame
+<br>&emsp;&emsp;&emsp;self.update()
+<br>&emsp;&emsp;&emsp;self.draw()
+<br>
+<br>##&emsp;&emsp;elif self.state == 3:
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;elif self.state == 4: #game_over
+<br>&emsp;&emsp;&emsp;self.gameover()
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;elif self.state == 5: #clear
+<br>&emsp;&emsp;&emsp;self.clear()
+<br>
+<br>&emsp;def update(self):
+<br>&emsp;&emsp;self.pos = self.mouse_location()
+<br>&emsp;&emsp;if self.mouse_pre[0] == 1: #mouse left click
+<br>&emsp;&emsp;&emsp;if self.board[self.pos[0]][self.pos[1]] < 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.state = 4
+<br>&emsp;&emsp;&emsp;elif self.board[self.pos[0]][self.pos[1]] > 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.board_state[self.pos[0]][self.pos[1]] = 1
+<br>&emsp;&emsp;&emsp;elif self.board[self.pos[0]][self.pos[1]] == 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.zero(self.pos[0], self.pos[1])
+<br>&emsp;&emsp;&emsp;&emsp;self.zero_open()
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;if self.mouse_pre[2] == 1: #mouse right click
+<br>&emsp;&emsp;&emsp;if self.board_state[self.pos[0]][self.pos[1]] == 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.board_state[self.pos[0]][self.pos[1]] = 2
+<br>&emsp;&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;for i in range(1, self.level[1] - 1): #count score
+<br>&emsp;&emsp;&emsp;for j in range(1, self.level[2] - 1):
+<br>&emsp;&emsp;&emsp;&emsp;if self.board_state[i][j] == 0:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.count[0] += 1
+<br>&emsp;&emsp;&emsp;&emsp;if self.board_state[i][j] == 2:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.count[1] += 1
+<br>&emsp;&emsp;self.count[0] += self.count[1]
+<br>&emsp;&emsp;self.count[2] = self.level[3] - self.count[1]
+<br>&emsp;&emsp;if self.count[0] == self.level[3]:
+<br>&emsp;&emsp;&emsp;self.state = 5
+<br>&emsp;&emsp;
+<br>&emsp;&emsp;self.text_score = self.m_font.render("{}".format(self.count[2]), True, BLACK)
+<br>&emsp;&emsp;self.count = [0, 0, 0]
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;def draw(self):
+<br>&emsp;&emsp;pg.draw.rect(self.screen, GRAY, [0, 0, 500, 100]) #background
+<br>&emsp;&emsp;pg.draw.rect(self.screen, WHITE, [200, 25, 100, 50]) #score board
+<br>&emsp;&emsp;self.screen.blit(self.text_score, [200, 25]) #score
+<br>&emsp;&emsp;for i in range(1, self.level[1]):
+<br>&emsp;&emsp;&emsp;for j in range(1, self.level[2]):
+<br>&emsp;&emsp;&emsp;&emsp;if self.board_state[i][j] == 0:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.screen.blit(self.unclicked, [(i-1) * self.level[4], (j-1) * self.level[4] + 100])
+<br>&emsp;&emsp;&emsp;&emsp;elif self.board_state[i][j] == 1:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.screen.blit(self.clicked, [(i-1) * self.level[4], (j-1) * self.level[4] + 100])
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;if self.board[i][j] != 0:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;self.board_text = self.s_font.render("{}".format(self.board[i][j]), True, BLACK)
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;self.screen.blit(self.board_text, [(i-1) * self.level[4], (j-1) * self.level[4] + 100])
+<br>&emsp;&emsp;&emsp;&emsp;elif self.board_state[i][j] == 2:
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.screen.blit(self.flag, [(i-1) * self.level[4], (j-1) * self.level[4] + 100])
+<br>&emsp;&emsp;pg.draw.rect(self.screen, BLACK, [(self.pos[0] - 1) * self.level[4], (self.pos[1] - 1) * self.level[4] + 100, self.level[4], self.level[4]], 5 - self.level[0])
+<br>&emsp;&emsp;pg.display.update()
+<br>
+<br>&emsp;def clear(self):
+<br>&emsp;&emsp;self.mouse_state = self.mouse_location()
+<br>&emsp;&emsp;pg.draw.rect(self.screen, GRAY, [85, 85, 330, 330])
+<br>&emsp;&emsp;self.text_clear = self.font.render("CLEAR!", True, BLACK)
+<br>&emsp;&emsp;if self.mouse_pre[0] == 0:
+<br>&emsp;&emsp;&emsp;if self.mouse_state == 1:
+<br>&emsp;&emsp;&emsp;&emsp;self.text_newgame = self.font.render("New game", True, RED)
+<br>&emsp;&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;&emsp;self.text_newgame = self.font.render("New game", True, BLACK)
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_clear, [150, 140])
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_newgame, [160, 300])
+<br>&emsp;&emsp;elif self.mouse_pre[0] == 1:
+<br>&emsp;&emsp;&emsp;if self.mouse_state == 1:
+<br>&emsp;&emsp;&emsp;&emsp;self.new()
+<br>&emsp;&emsp;pg.display.update()
+<br>
+<br>&emsp;def gameover(self):
+<br>&emsp;&emsp;self.mouse_state = self.mouse_location()
+<br>&emsp;&emsp;pg.draw.rect(self.screen, GRAY, [85, 85, 330, 330])
+<br>&emsp;&emsp;self.text_GO = self.font.render("Game Over", True, BLACK)
+<br>&emsp;&emsp;if self.mouse_pre[0] == 0:
+<br>&emsp;&emsp;&emsp;if self.mouse_state == 1:
+<br>&emsp;&emsp;&emsp;&emsp;self.text_newgame = self.font.render("New game", True, RED)
+<br>&emsp;&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;&emsp;self.text_newgame = self.font.render("New game", True, BLACK)
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_GO, [150, 140])
+<br>&emsp;&emsp;&emsp;self.screen.blit(self.text_newgame, [160, 300])
+<br>&emsp;&emsp;elif self.mouse_pre[0] == 1:
+<br>&emsp;&emsp;&emsp;if self.mouse_state == 1:
+<br>&emsp;&emsp;&emsp;&emsp;self.new()
+<br>&emsp;&emsp;pg.display.update()
+<br>&emsp;&emsp;
+<br>&emsp;def mouse_location(self):
+<br>&emsp;&emsp;self.mouse = pg.mouse.get_pos()
+<br>&emsp;&emsp;self.mouse_pre = pg.mouse.get_pressed()
+<br>&emsp;&emsp;if self.state == 1: #select
+<br>&emsp;&emsp;&emsp;if self.mouse[0] > 230 and self.mouse[0] <= 480 and self.mouse[1] > 70 and self.mouse[1] <= 170: #easy
+<br>&emsp;&emsp;&emsp;&emsp;return 1
+<br>&emsp;&emsp;&emsp;elif self.mouse[0] > 230 and self.mouse[0] <= 480 and self.mouse[1] > 200 and self.mouse[1] <= 300: #normal
+<br>&emsp;&emsp;&emsp;&emsp;return 2
+<br>&emsp;&emsp;&emsp;elif self.mouse[0] > 230 and self.mouse[0] <= 480 and self.mouse[1] > 330 and self.mouse[1] <= 430: #hard
+<br>&emsp;&emsp;&emsp;&emsp;return 3
+<br>&emsp;&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;&emsp;return 4
+<br>
+<br>&emsp;&emsp;elif self.state == 2: #ingame
+<br>&emsp;&emsp;&emsp;return int(self.mouse[0] / self.level[4]) + 1, int(self.mouse[1] / self.level[4] + 1 - (100 / self.level[4]))
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;elif self.state == 3: #spown mine
+<br>&emsp;&emsp;&emsp;return int(self.mouse[0] / self.level[4]) + 1, int(self.mouse[1] / self.level[4] + 1 - (100 / self.level[4]))
+<br>
+<br>&emsp;&emsp;elif self.state == 4: #gameover
+<br>&emsp;&emsp;&emsp;if self.mouse[0] > 150 and self.mouse[0] <= 350 and self.mouse[1] > 250 and self.mouse[1] <= 350:
+<br>&emsp;&emsp;&emsp;&emsp;return 1
+<br>&emsp;&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;&emsp;return 2
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;&emsp;elif self.state == 5: #clear
+<br>&emsp;&emsp;&emsp;if self.mouse[0] > 150 and self.mouse[0] <= 350 and self.mouse[1] > 250 and self.mouse[1] <= 350:
+<br>&emsp;&emsp;&emsp;&emsp;return 1
+<br>&emsp;&emsp;&emsp;else:
+<br>&emsp;&emsp;&emsp;&emsp;return 2
+<br>&emsp;&emsp;&emsp;
+<br>&emsp;def zero(self, x, y):
+<br>&emsp;&emsp;self.zero_check(x, y)
+<br>
+<br>&emsp;def zero_check(self, x, y):
+<br>&emsp;&emsp;if self.check.count([x, y]) == 0:
+<br>&emsp;&emsp;&emsp;self.check.append([x, y])
+<br>&emsp;&emsp;if x - 1 > 0 and x - 1 < self.level[1] - 1 and y > 0 and y < self.level[2] - 1:
+<br>&emsp;&emsp;&emsp;if self.board[x - 1][y] == 0 and self.board_state[x - 1][y] == 0 and self.check.count([x - 1, y]) == 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.zero_check(x - 1, y)
+<br>&emsp;&emsp;&emsp;&emsp;self.check.append([x - 1, y])
+<br>
+<br>&emsp;&emsp;if x + 1 > 0 and x + 1 < self.level[1] - 1 and y > 0 and y < self.level[2] - 1:
+<br>&emsp;&emsp;&emsp;if self.board[x + 1][y] == 0 and self.board_state[x + 1][y] == 0 and self.check.count([x + 1, y]) == 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.zero_check(x + 1, y)
+<br>&emsp;&emsp;&emsp;&emsp;self.check.append([x + 1, y])
+<br>
+<br>&emsp;&emsp;if x > 0 and x < self.level[1] - 1 and y - 1 > 0 and y - 1 < self.level[2] - 1:
+<br>&emsp;&emsp;&emsp;if self.board[x][y - 1] == 0 and self.board_state[x][y - 1] == 0 and self.check.count([x, y - 1]) == 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.zero_check(x, y - 1)
+<br>&emsp;&emsp;&emsp;&emsp;self.check.append([x, y - 1])
+<br>
+<br>&emsp;&emsp;if x > 0 and x < self.level[1] - 1 and y + 1 > 0 and y + 1 < self.level[2] - 1:
+<br>&emsp;&emsp;&emsp;if self.board[x][y + 1] == 0 and self.board_state[x][y + 1] == 0 and self.check.count([x, y + 1]) == 0:
+<br>&emsp;&emsp;&emsp;&emsp;self.zero_check(x, y + 1)
+<br>&emsp;&emsp;&emsp;&emsp;self.check.append([x, y + 1])
+<br>
+<br>&emsp;def zero_open(self):
+<br>&emsp;&emsp;for i in self.check:
+<br>&emsp;&emsp;&emsp;for a in range(-1, 2):
+<br>&emsp;&emsp;&emsp;&emsp;for b in range(-1, 2):
+<br>&emsp;&emsp;&emsp;&emsp;&emsp;self.board_state[i[0] + a][i[1] + b] = 1
+<br>
+<br>&emsp;&emsp;
+<br>g = game()&emsp;&emsp;&emsp;&emsp;
+<br>while g.running:
+<br>&emsp;g.clock.tick(20)
+<br>&emsp;for event in pg.event.get():
+<br>&emsp;&emsp;if event.type == pg.QUIT:
+<br>&emsp;&emsp;&emsp;g.running = False
+<br>&emsp;g.run()
+<br>pg.quit()
+<br>sys.exit()
+<br>>>>
+참 힘든 싸움이였다. pygame가 익숙해져있던 터라 제작 자체는 큰 어려움이 없었는데 딱 한가지 지뢰찾기의 꽃인 연쇄 오픈 기능 구현이 너무나도 힘들었다. 참 별의 별 시도를 다해본 결과 재귀함수를 사용하여 해결하였다.
+<br>마우스를 이용한 첫 게임이며 난이도까지 구현되어있다. 평소 지뢰찾기를 좋아해 제작하게 되었으며 단순해보이는 게임일 수록 어려운 부분이 있다는 것을 깨달았다.
+<br>>>>
+<iframe width="980" height="532" src="https://www.youtube.com/embed/rLP1aSXw1uU?list=PLeWHcBUi6c1fnOcG7w04ukyeKeDv6ezUG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
