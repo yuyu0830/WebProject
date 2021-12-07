@@ -1,0 +1,99 @@
+0
+<br>>>>
+숫자야구
+<br>>>>
+ - 이름 : 숫자야구
+<br> - 작성 : 파이썬
+<br> - 제작 기간 : 1일
+<br> - 제작 시기 : 21년 2월
+<br> - 설명 : 숫자야구를 파이썬으로 구현. 
+겹치는 숫자가 없는 임의의 4자리 숫자를 스무고개 하듯이 맞춰가는 게임. 
+플레이어는 한 턴마다 임의의 4자리 숫자를
+말할 수 있고, 질문자는 임의의 4숫자와 자신이 정한 4숫자를 비교하여 C와 B 카운트를 통해 알려준다.
+이 C와 B 카운트를 통해 질문자가 정한 4자리 숫자를
+맞추면 플레이어의 승리, 맞추지 못하면 질문자의 승리이다.
+<br>>>>
+import random
+<br>
+<br>def fin_err(ins) :
+<br>    inc = str(ins)
+<br>    if len(inc) != 4 :
+<br>        return 0
+<br>    else :
+<br>        for i in range(0,9) :
+<br>            ck = inc.count(str(i))
+<br>            if ck >= 2 :
+<br>                return 0
+<br>            
+<br>        return 1
+<br>
+<br>def rand() :
+<br>    num = []
+<br>    ran = str(random.randint(1,9))
+<br>    num.append(ran)
+<br>    i = 0
+<br>    
+<br>    while i != 3 :
+<br>        ran = str(random.randint(0,9))
+<br>        if ran not in num :
+<br>            num.append(ran)
+<br>            i += 1
+<br>    return num
+<br>
+<br>def sb(num, inc) :
+<br>    i = 0
+<br>    b = 0
+<br>    for i in range(0,4):
+<br>        if inc[i] == num[i]:
+<br>            b += 1
+<br>    return b
+<br>
+<br>def sc(num, inc) :
+<br>    i = 0
+<br>    c = 0
+<br>    for i in range(0,4):
+<br>        if inc[i] in num:
+<br>            c += 1
+<br>    return c
+<br>
+<br>def main() :
+<br>    num = rand()
+<br>    turn = 1
+<br>    b = 0
+<br>    
+<br>    while turn <= 10 and b != 4 :
+<br>        ins = int(input("\n{}번째 턴입니다.\n예상 값을 입력해주세요 : ".format(turn)))
+<br>        while fin_err(ins) == False :
+<br>            ins = int(input("잘못된 입력입니다.\n값을 다시 입력해주세요 : "))
+<br>
+<br>        inc = str(ins)
+<br>        
+<br>        b = sb(num, inc)
+<br>        c = sc(num, inc)
+<br>
+<br>        if c == 0 and b > 0 :
+<br>            continue
+<br>        else :
+<br>            c = c - b
+<br>        
+<br>
+<br>        if b == 4 :
+<br>            print("축하합니다! 정답입니다!\n입력횟수 {}번".format(turn))
+<br>
+<br>        elif b!= 4 and turn > 9 :
+<br>            print("실패입니다. Game Over\n정답 : "+num)
+<br>
+<br>        else :
+<br>            print("{}B{}C".format(b, c))
+<br>            turn += 1
+<br>
+<br>main()
+<br>re = int(input("다시하시려면 1, 아니면 0 을 눌러주세요 : "))
+<br>if re == 1 :
+<br>    re = 0
+<br>    main()
+<br>>>>
+ 처음으로 직쩝 짜본 코드인 만큼 의미가 크다. 처음은 직접 짜보고 다른 사람들이 짜둔 코드를 보고 다시 한번 짜보았다. 
+<br>짜는 과정도 재미있었고 프로그램이 돌아가는 전체적인 모양새를 가늠할 수 있던 좋은 기회가 되었다.
+<br>>>>
+숫자야구<br>
