@@ -33,7 +33,36 @@
 			sync: "#carousel"
 		});
 		});
-		
+		function get_nex_prv(para){
+			var next, prev;
+			if (para == "a" || para == "b"){
+				if (para=="a"){
+					prev = "9";
+					next = "b";
+				}
+				else{
+					prev = "a";
+					next = "b";
+				}
+			}
+			else {
+				para = parseInt(para);
+				if (para==0){
+					prev = 0;
+					next = 1;
+				}
+				else if(para > 0 && para < 9){
+					prev = para - 1;
+					next = para + 1;
+				}
+				else if(para == 9){
+					prev = "8";
+					next = "a";
+				}
+			}
+			
+			return [next, prev];
+		}
 		function get_query(){ 
 			var url = document.location.href; 
 			var qs = url.substring(url.indexOf('=') + 1);
@@ -71,7 +100,10 @@
 		var page_num;
 		$(document).ready(function(){
 			page_num = get_query();
+			var next = get_nex_prv(page_num);
 			var link = "./files/" + page_num + "/";
+			$("#prev").attr("href", "./Project_1.html?para=" + next[1]);
+			$("#next").attr("href", "./Project_1.html?para=" + next[0]);
 			jQuery.get(link + "text.txt", function(data){
 				text = data.split(">>>>");
 				$('#title-title-text').html(text[0]);
@@ -97,14 +129,10 @@
 		</a>
 		<div id="nex-prv">
 			<a id="prev">
-				<div id="prev">
-					<p>Prev</p>
-				</div>
+				<p>Prev</p>
 			</a>
-			<a id="prev">
-				<div id="prev">
-					<p>next</p>
-				</div>
+			<a id="next">
+				<p>next</p>
 			</a>
 		</div>
 	</header>

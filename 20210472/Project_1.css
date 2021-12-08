@@ -121,7 +121,7 @@ header {
 #rogo{
   display: block;
   text-decoration: none;
-  width:75%;
+  width:70%;
   height:130px;
   margin:0px;
   padding:0px;
@@ -131,9 +131,9 @@ header {
 }
 #rogo p{
   color:black;
-  margin:20px 50%;
+  margin:20px 40%;
   padding:0px;
-  font-size:35pt;
+  font-size:40pt;
   text-align: center;
   transition:0.5s;
 }
@@ -146,7 +146,7 @@ header {
   transition:0.5s;
 }
 #nex-prv{
-  width:25%;
+  width:30%;
   height:130px;
   margin:0px;
   padding:0px;
@@ -155,14 +155,33 @@ header {
 }
 
 #nex-prv a, p{
+  display:block;
   float:left;
-  display:inline-block;
 }
 #nex-prv a{
   text-decoration: none;
-  height:100px;
+  width:50%;
+  height:130px;
+  background-color: gery;
 }
-
+#nex-prv a:hover{
+  background-color: black;
+  transition:0.5s;
+}
+#nex-prv p{
+  display:inline-block;
+  margin-left:25%;
+  width:50%;
+  color:black;
+  padding:0px;
+  font-size:25pt;
+  text-align: center;
+  transition:0.5s;
+}
+#nex-prv a:hover p{
+  color:white;
+  transition:0.5s;
+}
 /*섹션*/
 section {
   position: relative;
