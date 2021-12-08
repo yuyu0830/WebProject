@@ -100,11 +100,11 @@ p {
 
 /*자바스크립트용*/
 .nav-up {
-  top: -60px;
+  top: -130px;
   transition: 0.5s;
 }
 .sec-up {
-  margin-top: -60px;
+  margin-top: -130px;
   transition: 0.5s;
 }
 
@@ -117,6 +117,50 @@ header {
   top: 0px;
   transition: 0.5s;
   z-index: 1;
+}
+#rogo{
+  display: block;
+  text-decoration: none;
+  width:75%;
+  height:130px;
+  margin:0px;
+  padding:0px;
+  background-color: lightgray;
+  float:left;
+  transition:0.5s;
+}
+#rogo p{
+  color:black;
+  margin:20px 50%;
+  padding:0px;
+  font-size:35pt;
+  text-align: center;
+  transition:0.5s;
+}
+#rogo:hover{
+  background-color: black;
+  transition:0.5s;
+}
+#rogo:hover p{
+  color:white;
+  transition:0.5s;
+}
+#nex-prv{
+  width:25%;
+  height:130px;
+  margin:0px;
+  padding:0px;
+  background-color:darkgray;
+  float:left;
+}
+
+#nex-prv a, p{
+  float:left;
+  display:inline-block;
+}
+#nex-prv a{
+  text-decoration: none;
+  height:100px;
 }
 
 /*섹션*/

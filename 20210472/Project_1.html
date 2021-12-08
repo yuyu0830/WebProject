@@ -40,14 +40,14 @@
 			return qs; 
 		}
 
-		/*var didScroll;
+		var didScroll;
 		var lastScrollTop = 0;
 		var delta = 5;
 		var navbarHeight = $('header').outerHeight();
 		
 		$(window).scroll(function(event){
 			didScroll = true;
-		});*/
+		});
 
 		setInterval(function() {
 			if (didScroll) {
@@ -90,6 +90,23 @@
 </head>
 <body>
 	<header>
+		<a id="rogo" href="./Main.html">
+			<div>
+				<p>Home</p>
+			</div>
+		</a>
+		<div id="nex-prv">
+			<a id="prev">
+				<div id="prev">
+					<p>Prev</p>
+				</div>
+			</a>
+			<a id="prev">
+				<div id="prev">
+					<p>next</p>
+				</div>
+			</a>
+		</div>
 	</header>
 	<div id='content'>
 		<section>
